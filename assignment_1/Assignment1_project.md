@@ -31,3 +31,7 @@ conf: {
         LAMBDA_ACT: [0, 200],               
     },
 ```
+
+3. Done, experiment setup is in `experiment.html`.
+
+4. 
