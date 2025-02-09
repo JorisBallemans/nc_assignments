@@ -64,6 +64,7 @@ conf: {
    
 5. Where the cells could continue moving in their preferred direction in the base simulation, this changed considerably when they were introduced to obstacles. We found cells **staying near obstacles**, struggling to continue their path. We also noticed cells **clumping around obsacles**, where a larger group would stay together. After a while these groups sometimes resolved. A typical simulation often had two situations concurrenctly: **some cells moving freely while other cells were clumped together not moving**.
    The following picure shows examples of all these occuring:
+   
    <img src="https://github.com/user-attachments/assets/9a4d4bb3-8aa8-4bce-a684-5e193a0c5d61" width="200"/>
 
-6. / 
+7. / 
