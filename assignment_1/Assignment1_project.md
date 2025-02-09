@@ -33,7 +33,37 @@ conf: {
 ```
 
 3. Experiment setup is in `experiment.html`. We implemented an even spaced obstacle grid with migrating cells navigating between these obstacles.
- ![afbeelding](https://github.com/user-attachments/assets/da09e6b7-47d8-48d3-b834-b812de317a6b)
 
+   <img src="https://github.com/user-attachments/assets/da09e6b7-47d8-48d3-b834-b812de317a6b" width="200"/>
+  
+4. We notice various behaviour changes
 
-5. 
+   
+   **Obstacle movement:** The cells still move around the grid but considerably slower. When encountering an obstacle they often stop for a while as their movement direction is now obstructed.
+
+    Sometimes they also get stuck around an obstacle if it is directly in the middle of their movement direction, as seen in the left middle of this picture:
+   
+   <img src="https://github.com/user-attachments/assets/a8af7ff3-124d-44cc-b52a-7724e2169c05" width="200"/>
+   
+   **Obstacle density reactions:** Our base obstacle density was half the cell volume.
+
+   We have also experimented with a factor 4 smaller (compared to cell volume):
+
+   <img src="https://github.com/user-attachments/assets/2471f375-5b25-4ab4-b560-21aba9a5ad1b" width="200"/>
+
+   This resulted in much freer movement of the cells, The previous getting stuck behaviour when an obstacle was in the middle of the cell no longer occured.
+
+   At 75% obstacle volume we noticed considerable clumping and fewer movements.
+
+   <img src="https://github.com/user-attachments/assets/883c404a-275a-4758-b784-939f10af49c5" width ="200"/>
+   
+   
+   and any obstacle as big as the cells themselves or bigger obstruced lanes and gave no movement possibilities at all:
+
+   <img src="https://github.com/user-attachments/assets/fab8b30f-e2e8-4bc1-9aa3-046f62763bff" width="200"/>
+   
+5. Where the cells could continue moving in their preferred direction in the base simulation, this changed considerably when they were introduced to obstacles. We found cells **staying near obstacles**, struggling to continue their path. We also noticed cells **clumping around obsacles**, where a larger group would stay together. After a while these groups sometimes resolved. A typical simulation often had two situations concurrenctly: **some cells moving freely while other cells were clumped together not moving**.
+   The following picure shows examples of all these occuring:
+   <img src="https://github.com/user-attachments/assets/9a4d4bb3-8aa8-4bce-a684-5e193a0c5d61" width="200"/>
+
+6. / 
