@@ -67,4 +67,8 @@ conf: {
    
    <img src="https://github.com/user-attachments/assets/9a4d4bb3-8aa8-4bce-a684-5e193a0c5d61" width="200"/>
 
+<<<<<<< HEAD
 
+=======
+7. / 
+>>>>>>> e4795955e934352d79b31d2477552e946b503749
