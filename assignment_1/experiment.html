@@ -1,34 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta
-      http-equiv="Content-Type"
-      content="text/html;
-charset=UTF-8"
-    />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Assignment</title>
     <style type="text/css">
       body {
         font-family: "HelveticaNeue-Light", sans-serif;
         padding: 15px;
       }
+      #clock {
+        font-size: 1.5em;
+        margin-top: 10px;
+      }
+      .snapshot-links {
+        margin-top: 20px;
+      }
+      .snapshot-links a {
+        display: block;
+        margin: 5px 0;
+      }
     </style>
     <script src="../artistoo/build/artistoo.js"></script>
     <script>
       "use strict";
 
+      let sim;
+      let startTime;
+      let clockInterval;
+      let canvas;
+
       document.addEventListener("click", function (event) {
-        let canvas = document.querySelector("canvas");
+        canvas = document.querySelector("canvas");
         let rect = canvas.getBoundingClientRect();
         let x = event.clientX - rect.left;
         let y = event.clientY - rect.top;
         x = Math.floor((x / canvas.width) * sim.C.extents[0]);
         y = Math.floor((y / canvas.height) * sim.C.extents[1]);
         sim.gm.seedCellAt(2, [x, y]);
-    });
+      });
 
       function initializeGrid() {
-        //Grid of obstacles
+        // Grid of obstacles
         if (!this.helpClasses["gm"]) {
           this.addGridManipulator();
         }
@@ -38,18 +50,32 @@ charset=UTF-8"
             this.gm.seedCellAt(2, [i, j]);
           }
         }
-        //Spawn 10 random cells
-        for (let k = 0; k < 10; k++) {
-          let x = Math.floor(Math.random() * this.C.extents[0]);
-          let y = Math.floor(Math.random() * this.C.extents[1]);
-          this.gm.seedCellAt(1, [x, y]);
+        // Spawn 10 random cells
+        // for (let k = 0; k < 10; k++) {
+        //   let x = Math.floor(Math.random() * this.C.extents[0]);
+        //   let y = Math.floor(Math.random() * this.C.extents[1]);
+        //   this.gm.seedCellAt(1, [x, y]);
+        // }
+        // let max_moving_cells = 150;
+        let max_moving_cells = 2;
+        let step_moving = 20;
+        let OFFSET = 5;
+        for (let i = 0; i < this.C.extents[0]; i += step_moving) {
+          for (let j = 0; j < this.C.extents[1]; j += step_moving) {
+            console.log([i + OFFSET, j + OFFSET]);
+            this.gm.seedCellAt(1, [i + OFFSET, j + OFFSET]);
+            max_moving_cells -= 1;
+            if (max_moving_cells == 0) {
+              return;
+            }
+          }
         }
       }
-    
-      let sim;
+
       let config = {
         ndim: 2,
-        field_size: [100, 100],
+        // field_size: [200, 200],
+        field_size: [50, 50],
         conf: {
           T: 20,
           J: [
@@ -58,8 +84,8 @@ charset=UTF-8"
             [1000, 1000, 1000],
           ],
           LAMBDA_V: [0, 50, 1000],
-          V: [0, 200, 100], //Standard 100, experimented with [50,150,200]
-          LAMBDA_P: [0, 2, 2],
+          V: [0, 200, 100], // Standard 100, experimented with [50,150,200]
+          LAMBDA_P: [0, 2, 300],
           P: [0, 180, 0],
           MAX_ACT: [0, 80, 0],
           ACT_MEAN: "geometric",
@@ -67,11 +93,11 @@ charset=UTF-8"
         },
 
         simsettings: {
-          CELLCOLOR: ["00FF00", "000000"],
-          ACTCOLOR : [true,false],
+          CELLCOLOR: ["48BB78", "4A5568"],
+          ACTCOLOR: [true, false],
           NRCELLS: [0, 0],
           RUNTIME: 500,
-          CANVASCOLOR: "eaecef",
+          CANVASCOLOR: "F0F4F8",
           zoom: 4,
         },
       };
@@ -79,6 +105,8 @@ charset=UTF-8"
       function init() {
         sim = new CPM.Simulation(config, { initializeGrid: initializeGrid });
         sim.run();
+        startTime = Date.now();
+        clockInterval = setInterval(updateClock, 1000);
         step();
       }
 
@@ -86,10 +114,47 @@ charset=UTF-8"
         sim.step();
         requestAnimationFrame(step);
       }
+
+      function updateClock() {
+        let currentTime = Date.now();
+        let elapsedTime = Math.floor((currentTime - startTime) / 1000);
+        let hours = Math.floor(elapsedTime / 3600);
+        let minutes = Math.floor((elapsedTime % 3600) / 60);
+        let seconds = elapsedTime % 60;
+        document.getElementById("clock").textContent =
+          ("0" + hours).slice(-2) +
+          ":" +
+          ("0" + minutes).slice(-2) +
+          ":" +
+          ("0" + seconds).slice(-2);
+
+        // Take snapshots at 0, 1, and 2 minutes
+        if (minutes === 0 && seconds === 1) {
+          takeSnapshot("0_minutes");
+        } else if (minutes === 1 && seconds === 0) {
+          takeSnapshot("1_minute");
+        } else if (minutes === 2 && seconds === 0) {
+          takeSnapshot("2_minutes");
+        }
+      }
+
+      function takeSnapshot(name) {
+        canvas = document.querySelector("canvas");
+        let dataURL = canvas.toDataURL("image/png");
+        let link = document.createElement("a");
+        link.href = dataURL;
+        link.download = `${name}_snapshot.png`;
+        link.textContent = `Download ${name} Snapshot`;
+        document.querySelector(".snapshot-links").appendChild(link);
+      }
     </script>
   </head>
 
   <body onload="init()">
     <h1>Assignment 1</h1>
+    <div id="clock">00:00:00</div>
+    <div class="snapshot-links">
+      <h3>Snapshots:</h3>
+    </div>
   </body>
 </html>
