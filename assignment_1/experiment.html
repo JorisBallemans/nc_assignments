@@ -44,20 +44,24 @@
         if (!this.helpClasses["gm"]) {
           this.addGridManipulator();
         }
+        //OBSTACLES
         let step = 20;
         for (let i = 1; i < this.C.extents[0]; i += step) {
           for (let j = 1; j < this.C.extents[1]; j += step) {
             this.gm.seedCellAt(2, [i, j]);
           }
         }
+
         // Spawn 10 random cells
         // for (let k = 0; k < 10; k++) {
         //   let x = Math.floor(Math.random() * this.C.extents[0]);
         //   let y = Math.floor(Math.random() * this.C.extents[1]);
         //   this.gm.seedCellAt(1, [x, y]);
         // }
-        // let max_moving_cells = 150;
-        let max_moving_cells = 2;
+
+        //MOVING CELLS
+        let max_moving_cells = 150;
+        // let max_moving_cells = 2;
         let step_moving = 20;
         let OFFSET = 5;
         for (let i = 0; i < this.C.extents[0]; i += step_moving) {
@@ -74,8 +78,8 @@
 
       let config = {
         ndim: 2,
-        // field_size: [200, 200],
-        field_size: [50, 50],
+        field_size: [200, 200],
+        // field_size: [50, 50],
         conf: {
           T: 20,
           J: [
@@ -84,7 +88,7 @@
             [1000, 1000, 1000],
           ],
           LAMBDA_V: [0, 50, 1000],
-          V: [0, 200, 100], // Standard 100, experimented with [50,150,200]
+          V: [0, 200, 200], // Standard 100, experimented with [50,150,200]
           LAMBDA_P: [0, 2, 300],
           P: [0, 180, 0],
           MAX_ACT: [0, 80, 0],
