@@ -18,7 +18,7 @@ def pso_color_quantization(image, w, a1, a2):
     global_best = np.array([0, 0, 0])
     
     not_happy = True
-    j = 10
+    j = 25
 
     while not_happy:
         j -= 1
@@ -41,7 +41,7 @@ def pso_color_quantization(image, w, a1, a2):
                 global_best = new_particles[i]
         particles = new_particles
 
-    return local_best
+    return particles
         
      
 
