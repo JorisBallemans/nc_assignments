@@ -375,7 +375,7 @@ class Scene {
 		//const dist = Math.hypot(pos2[0] - pos1[0], pos2[1] - pos1[1] )	
 	}
 	
-	neighbours( x, distanceThreshold ){
+	getNeighbours( x, distanceThreshold ){
 		let r = []
 		for( let p of this.swarm ){
 			if( p.id == x.id ) continue 
