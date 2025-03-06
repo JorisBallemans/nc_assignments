@@ -195,7 +195,7 @@ class Scene {
 		//const dist = Math.hypot(pos2[0] - pos1[0], pos2[1] - pos1[1] )	
 	}
 	
-	neighbours( x, distanceThreshold ){
+	getNeighbours( x, distanceThreshold ){
 		let r = []
 		for( let p of this.swarm ){
 			if( p.id == x.id ) continue 
@@ -255,23 +255,48 @@ class Particle {
 	// should return a unit vector in average neighbor direction for neighbors within 
 	// distance neighborRadius 
 	alignmentVector( neighborRadius ){
-		
-		return this.dir
-	
+		let average = [0,0]
+		let neighbours = S.getNeighbours(this, neighborRadius)
+		if (neighbours.length == 0) return average
+
+		for (let neighbour of neighbours){
+			average = this.addVectors(average, neighbour.dir)
+		}
+		average = this.multiplyVector(average, 1/neighbours.length)
+		average = this.normalizeVector(average)
+		return average
 	}
 	
 	// should return a unit vector in the direction from current position to the 
 	// average position of neighbors within distance neighborRadius 
 	cohesionVector( neighborRadius ){
-		
-		return this.dir
+		let average = [0,0]
+		let neighbours = S.getNeighbours(this, neighborRadius)
+		if (neighbours.length == 0) return average
+
+		for (let neighbour of neighbours){
+			average = this.addVectors(average, neighbour.pos)
+		}
+		average = this.multiplyVector(average, 1/neighbours.length)
+		let cohesion = this.subtractVectors(average, this.pos)
+		cohesion = this.normalizeVector(cohesion)
+		return cohesion
 	
 	}
 	
 	// as cohesionVector, but now return the opposite direction for the given 
 	separationVector( neighborRadius ){
-		
-		return this.dir 
+		let separation = [0,0]
+		let neighbours = S.getNeighbours(this, neighborRadius)
+		if (neighbours.length == 0) return separation
+		for (let neighbour of neighbours){
+			let difference = this.subtractVectors(this.pos, neighbour.pos)
+			difference = this.normalizeVector(difference)
+			separation = this.addVectors(separation, difference)
+		}
+		separation = this.multiplyVector(separation, 1/neighbours.length)
+		separation = this.normalizeVector(separation)
+		return separation
 		
 	}
 	
@@ -290,8 +315,12 @@ class Particle {
 		// Make sure to update the properties this.dir and this.pos accordingly.
 		// What happens when the new position lies across the field boundary? 
 		
-		this.pos = this.pos
-		this.dir = this.dir 	
+		this.dir = this.normalizeVector(this.addVectors(this.addVectors(align, cohesion), separation))
+		this.pos = this.addVectors(this.pos, this.dir)
+
+		this.pos = S.wrap(this.pos)
+
+
 		
 	}
 	
