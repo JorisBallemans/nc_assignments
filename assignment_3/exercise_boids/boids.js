@@ -315,7 +315,7 @@ class Particle {
 		// Make sure to update the properties this.dir and this.pos accordingly.
 		// What happens when the new position lies across the field boundary? 
 		
-		this.dir = this.normalizeVector(this.addVectors(this.addVectors(align, cohesion), separation))
+		this.dir = this.normalizeVector(this.addVectors(this.dir,(this.addVectors(this.addVectors(align, cohesion), separation))))
 		this.pos = this.addVectors(this.pos, this.dir)
 
 		this.pos = S.wrap(this.pos)

@@ -103,7 +103,7 @@ class Particle {
 		// Make sure to update the properties this.dir and this.pos accordingly.
 		// What happens when the new position lies across the field boundary? 
 		
-		this.dir = this.normalizeVector(this.addVectors(this.addVectors(align, cohesion), separation))
+		this.dir = this.normalizeVector(this.addVectors(this.dir,(this.addVectors(this.addVectors(align, cohesion), separation))))
 		this.pos = this.addVectors(this.pos, this.dir)
 
 		this.pos = S.wrap(this.pos)
@@ -405,7 +405,7 @@ if( saveImg ) canvas.writePNG( `${imgpath}/boids-t${S.time}.png` )
 console.log( "time,id,x,y")
 
 for( let t = 0; t <= conf.runTime; t++ ){
-	if( saveImg & t % 100 == 0 ){
+	if( saveImg & t % 20 == 0 ){
 		canvas.writePNG( `${imgpath}/boids-t${S.time}.png` )
 	}
 	
