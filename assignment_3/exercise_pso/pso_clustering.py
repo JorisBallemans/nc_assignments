@@ -82,6 +82,7 @@ def plot_all_iterations(image, global_best_history, plot_every=10):
         ax.axis('off')
     
     plt.tight_layout()
+    plt.savefig("pso_clustering_over_time.png", bbox_inches="tight", pad_inches=0)
     plt.show()
 
 best_image, global_best_history = pso_color_quantization_new(input_img, 0.73, 1.5, 1.5)
