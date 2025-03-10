@@ -32,7 +32,7 @@ def analyse(input_file):
     order_df = pd.DataFrame(order_values)
     order_df.to_csv(f"{input_file[:-4]}_evaluation.csv", index=False)
 
-input_folder = "experiments"
+input_folder = "experiments/555"
 csv_files = [f for f in os.listdir(input_folder) if f.endswith('.csv')]
 
 for csv_file in csv_files:
