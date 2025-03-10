@@ -1,0 +1,11 @@
+N=$1
+i=$2
+o=$3
+c=$4
+s=$5
+a=$6
+
+output_file="experiments/${N}_${i}_${o}_${c}_${s}_${a}"
+
+node node-boids-template.js -f 400 -N $N -i $i -o $o -c $c -s $s -a $a -T 1000 > "$output_file.csv"
+node node-boids-template.js -f 400 -N $N -i $i -o $o -c $c -s $s -a $a -T 1000 -I $output_file
