@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-data = pd.read_csv("50_10_25_1_1_1.csv")
+data = pd.read_csv("experiments/50_10_50_1_1_1.csv")
 
 data["norm_vec_x"] = data["x"] / np.sqrt(np.power(data["x"],2) + np.power(data["y"],2))
 data["norm_vec_y"] = data["y"] / np.sqrt(np.power(data["x"],2) + np.power(data["y"],2))
