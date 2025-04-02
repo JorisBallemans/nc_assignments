@@ -2,11 +2,14 @@ import random
 
 ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 LENGTH = 15
-TARGET = "AAAAAAAAAAAAAAA"#"".join(random.choices(ALPHABET, k=LENGTH))
+TARGET = "NATURALCOMPUTING"#"".join(random.choices(ALPHABET, k=LENGTH))
 K = 2
 POPULATION_SIZE = 200
 CROSSOVER_RATE = 1
 MUTATION_RATE = 1/LENGTH
+MAX_GEN = 2000
+
+
 
 class Candidate():
     def __init__(self, S, target, string=None):
@@ -15,7 +18,8 @@ class Candidate():
         self.p_i = 0
 
     def update_fitness(self, target):
-        return sum([1 for i in range(len(self.string)) if self.string[i] == target[i]])
+        # fitness function y = x^2 with x the number of matching characters
+        return sum([1 for i in range(len(self.string)) if self.string[i] == target[i]]) ** 2
 
     def calculate_p_i(self, total_fitness):
         self.p_i = self.fitness / total_fitness if total_fitness != 0 else 0
@@ -27,6 +31,7 @@ class Candidate():
                 list_string[i] = random.choice(S)
         self.string = "".join(list_string)
         self.fitness = self.update_fitness(target)
+        
 
     def __str__(self):
         return f"String: {self.string} with P_i: {self.p_i} with fitness: {self.fitness}"
@@ -40,7 +45,6 @@ def string_search(K, S, target, P_c , mu, N):
     for _ in range(N):
         population.append(Candidate(S, target))
 
-    MAX_GEN = 1000
     generation = 0
 
     while generation < MAX_GEN:
@@ -63,15 +67,19 @@ def string_search(K, S, target, P_c , mu, N):
         new_population = []
         
         while len(new_population) < N:
-            #Sample K random tournament participants
             K_population = random.choices(population, k=K)
 
-            #Select parents
-            p1, p2 = None, None
             if sum([c.p_i for c in K_population]) == 0:
-                p1, p2 = random.choices(K_population, k=2)
+                p1 = random.choices(K_population, k=1)[0]
             else:
-                p1, p2 = random.choices(K_population, weights = [c.p_i for c in K_population], k=2)
+                p1 = random.choices(K_population, weights = [c.p_i for c in K_population], k=1)[0]
+
+            K_population = random.choices(population, k=K)
+
+            if sum([c.p_i for c in K_population]) == 0:
+                p2 = random.choices(K_population, k=1)[0]
+            else:
+                p2 = random.choices(K_population, weights = [c.p_i for c in K_population], k=1)[0]
             
             #Crossover or mutate
             if random.random() < P_c:
