@@ -55,6 +55,10 @@ def mutate_child(child):
     return child
 
 def simple_ea(cities):
+    print("Simple EA")
+    opt_found = False
+    found_at = -1
+    
     population = [random.sample(cities, k=len(cities)) for _ in range(POPULATION_SIZE)]
     for i in range(NUM_ITER):
         # Generate random tours and calculate fitnesses
@@ -80,6 +84,72 @@ def simple_ea(cities):
         population = new_population
         # Printing to show progress
         print(f'Iteration {i}, best fitness: {max(fitnesses)}, avg fitness: {statistics.mean(fitnesses)}')
+        if max(fitnesses) >= 1.68268511388267 and not opt_found:
+            found_at = i
+            opt_found = True
+    return found_at
 
+def two_opt_swap(tour, i, j):
+    new_tour = tour.copy()
+    new_tour[i:j] = reversed(tour[i:j])
+    return new_tour
+
+def two_opt(tour):
+    best_fitness = fitness(tour)
+    improved = True
+    while improved:
+        improved = False
+        for i in range(0, len(tour) - 1):
+            for j in range(i + 1, len(tour)):
+                if fitness(two_opt_swap(tour, i, j)) > best_fitness:
+                    tour = two_opt_swap(tour, i, j)
+                    best_fitness = fitness(tour)
+                    improved = True
+    return tour
+
+def memetic_algorithm(cities):
+    print("Memetic Algorithm")
+    opt_found = False
+    found_at = -1
+    
+    population = [random.sample(cities, k=len(cities)) for _ in range(POPULATION_SIZE)]
+    for i in range(NUM_ITER):
+        # Local search
+        for p in population:
+            p = two_opt(p)
+        
+        # Generate random tours and calculate fitnesses
+        fitnesses = [fitness(p) for p in population]
+        total_fitness = sum(fitnesses)
+        probabilities = [f/total_fitness for f in fitnesses]
+        
+        new_population = []
+        for _ in range(int(POPULATION_SIZE/2)):
+            # Tournament selection for parents with K=2
+            parents = []
+            for _ in range(2):
+                candidates = random.choices(population, probabilities, k=K)
+                parents.append(candidates[0] if fitness(candidates[0]) > fitness(candidates[1]) else candidates[1])
+                
+            # Make children
+            children = order_crossover(parents[0], parents[1])
+            for child in children:
+                if random.random() < MUTATION_PROB:
+                    child = mutate_child(child)
+                new_population.append(child)
+        
+        population = new_population
+        # Printing to show progress
+        print(f'Iteration {i}, best fitness: {max(fitnesses)}, avg fitness: {statistics.mean(fitnesses)}')
+        if max(fitnesses) >= 1.68268511388267 and not opt_found:
+            found_at = i
+            opt_found = True
+    return found_at
+
+    
 cities = import_cities('./file-tsp.txt')
-simple_ea(cities)
+ea = simple_ea(cities)
+ma = memetic_algorithm(cities)
+
+print(f"Simple EA found optimal route at iteration: {ea}")
+print(f"Memetic Algorithm found optimal route at iteration: {ma}")
