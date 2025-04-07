@@ -55,9 +55,9 @@ def mutate_child(child):
     return child
 
 def simple_ea(cities):
+    population = [random.sample(cities, k=len(cities)) for _ in range(POPULATION_SIZE)]
     for i in range(NUM_ITER):
         # Generate random tours and calculate fitnesses
-        population = [random.sample(cities, k=len(cities)) for _ in range(POPULATION_SIZE)]
         fitnesses = [fitness(p) for p in population]
         total_fitness = sum(fitnesses)
         probabilities = [f/total_fitness for f in fitnesses]
@@ -77,6 +77,7 @@ def simple_ea(cities):
                     child = mutate_child(child)
                 new_population.append(child)
         
+        population = new_population
         # Printing to show progress
         print(f'Iteration {i}, best fitness: {max(fitnesses)}, avg fitness: {statistics.mean(fitnesses)}')
 
