@@ -4,7 +4,7 @@ import statistics
 POPULATION_SIZE = 100
 MUTATION_PROB = 0.001
 K = 2
-NUM_ITER = 2000
+NUM_ITER = 200
 
 def import_cities(filename):
     with open(filename) as f:
@@ -15,7 +15,8 @@ def fitness(tour):
     distance = 0
     for i in range(len(tour) - 1):
         distance += ((tour[i][0] - tour[i + 1][0]) ** 2 + (tour[i][1] - tour[i + 1][1]) ** 2) ** 0.5
-        return 1/distance
+    
+    return 1/distance
     
 def order_crossover(parent1, parent2):
     # Get 2 random cut points
@@ -56,7 +57,7 @@ def mutate_child(child):
 
 def simple_ea(cities):
     print("Simple EA")
-    opt_found = False
+    highest_fitness = 0
     found_at = -1
     
     population = [random.sample(cities, k=len(cities)) for _ in range(POPULATION_SIZE)]
@@ -84,10 +85,10 @@ def simple_ea(cities):
         population = new_population
         # Printing to show progress
         print(f'Iteration {i}, best fitness: {max(fitnesses)}, avg fitness: {statistics.mean(fitnesses)}')
-        if max(fitnesses) >= 1.68268511388267 and not opt_found:
+        if max(fitnesses) > highest_fitness:
             found_at = i
-            opt_found = True
-    return found_at
+            highest_fitness = max(fitnesses)
+    return found_at, highest_fitness
 
 def two_opt_swap(tour, i, j):
     new_tour = tour.copy()
@@ -109,7 +110,7 @@ def two_opt(tour):
 
 def memetic_algorithm(cities):
     print("Memetic Algorithm")
-    opt_found = False
+    highest_fitness = 0
     found_at = -1
     
     population = [random.sample(cities, k=len(cities)) for _ in range(POPULATION_SIZE)]
@@ -141,15 +142,22 @@ def memetic_algorithm(cities):
         population = new_population
         # Printing to show progress
         print(f'Iteration {i}, best fitness: {max(fitnesses)}, avg fitness: {statistics.mean(fitnesses)}')
-        if max(fitnesses) >= 1.68268511388267 and not opt_found:
+        if max(fitnesses) > highest_fitness:
             found_at = i
-            opt_found = True
-    return found_at
+            highest_fitness = max(fitnesses)
+    return found_at, highest_fitness
 
     
 cities = import_cities('./file-tsp.txt')
-ea = simple_ea(cities)
-ma = memetic_algorithm(cities)
+ea, ea_fitness = simple_ea(cities)
+ma, ma_fitness = memetic_algorithm(cities)
 
-print(f"Simple EA found optimal route at iteration: {ea}")
-print(f"Memetic Algorithm found optimal route at iteration: {ma}")
+print(f"Simple EA found optimal route with distance {1/ea_fitness} at iteration: {ea}")
+print(f"Memetic Algorithm found optimal route with distance {1/ma_fitness} at iteration: {ma}")
+
+cities = import_cities('./berlin52.txt')
+ea, ea_fitness = simple_ea(cities)
+ma, ma_fitness = memetic_algorithm(cities)
+
+print(f"Simple EA found optimal route with distance {1/ea_fitness} at iteration: {ea}")
+print(f"Memetic Algorithm found optimal route with distance {1/ma_fitness} at iteration: {ma}")
