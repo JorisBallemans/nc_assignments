@@ -1,4 +1,5 @@
 import random, math
+import pandas as pd
 
 ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 LENGTH = 15
@@ -7,9 +8,7 @@ K = 2
 POPULATION_SIZE = 200
 CROSSOVER_RATE = 1
 MUTATION_RATE = 1/LENGTH
-MAX_GEN = 100000
-
-
+MAX_GEN = 200
 
 class Candidate():
     def __init__(self, S, target, string=None):
@@ -53,6 +52,7 @@ def shannon_entropy(population :list[Candidate], index):
     return -total
 
 def string_search(K, S, target, P_c , mu, N):
+    data = pd.DataFrame(columns=["gen", "avg_distance", "shannon_entropy"])
     population = []
     total_fitness = 0
 
@@ -63,31 +63,39 @@ def string_search(K, S, target, P_c , mu, N):
     generation = 0
 
     while generation < MAX_GEN:
-        print(avg_distance(population))
-        total_fitness = sum([c.fitness for c in population ])
+        # Calculate metrics
+        avg_dist = avg_distance(population)
+        shannon_ent = sum([shannon_entropy(population, i) for i in range(len(target))])
+
+        # Add metrics to dataframe
+        data = pd.concat([data, pd.DataFrame({
+            "gen": [generation],
+            "avg_distance": [avg_dist],
+            "shannon_entropy": [shannon_ent]
+        })], ignore_index=True)
+
+        total_fitness = sum([c.fitness for c in population])
         
         # Calculate P_i
         for c in population:
             c.calculate_p_i(total_fitness)
 
-        #Gewoon voor de leuk
+        # Sort population for debugging
         sorted_population = sorted(population, key=lambda x: x.fitness, reverse=True)
-        print(f"Best offspring: {sorted_population[0]}")
 
         if sorted_population[0].string == target:
-            print("Found target!")
-            return
+            return data
 
-        #Make new population
+        # Make new population
         new_population = []
         
         while len(new_population) < N:
             p1 = max(random.choices(population, k=K), key=lambda p: p.fitness)
             p2 = max(random.choices(population, k=K), key=lambda p: p.fitness)
             
-            #Crossover or mutate
+            # Crossover or mutate
             if random.random() < P_c:
-                #Crossover
+                # Crossover
                 split = random.randint(1, len(target) - 1)
                 o1 = Candidate(S, target, p1.string[:split] + p2.string[split:])
                 o2 = Candidate(S, target, p2.string[:split] + p1.string[split:])
@@ -96,10 +104,16 @@ def string_search(K, S, target, P_c , mu, N):
                 new_population.append(o1)
                 new_population.append(o2)
         
-        #Update
+        # Update
         population = new_population
         generation += 1
-        print(f"On generation: {generation}")
+
+    return data
 
 if __name__ == "__main__":
-    string_search(K, ALPHABET, TARGET, CROSSOVER_RATE, MUTATION_RATE ,POPULATION_SIZE)
+    for mu_rate in [0, 1/LENGTH, 3/LENGTH]:
+        for i in range(10):
+            results = string_search(K, ALPHABET, TARGET, CROSSOVER_RATE, mu_rate ,POPULATION_SIZE)
+            results.to_csv(f"results/{mu_rate}_run_{i}.csv", index=False)
+
+    # string_search(K, ALPHABET, TARGET, CROSSOVER_RATE, MUTATION_RATE ,POPULATION_SIZE) 
