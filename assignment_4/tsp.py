@@ -1,10 +1,11 @@
 import random
 import statistics
+import matplotlib.pyplot as plt
 
-POPULATION_SIZE = 100
+POPULATION_SIZE = 200
 MUTATION_PROB = 0.001
 K = 2
-NUM_ITER = 200
+NUM_ITER = 100
 
 def import_cities(filename):
     with open(filename) as f:
@@ -55,24 +56,33 @@ def mutate_child(child):
     child[positions[1]] = temp
     return child
 
-def simple_ea(cities):
+def plot_progress(best_fitnesses, avg_fitnesses, title):
+    plt.figure()
+    plt.plot(best_fitnesses, label="Best fitness per generation")
+    plt.plot(avg_fitnesses, label="Average fitness per generation")
+    plt.xlabel("Generation")
+    plt.ylabel("Fitness")
+    plt.legend()
+    plt.savefig(title)
+
+def simple_ea(cities, filename):
     print("Simple EA")
     highest_fitness = 0
     found_at = -1
+    best_fitnesses = []
+    avg_fitnesses = []
     
     population = [random.sample(cities, k=len(cities)) for _ in range(POPULATION_SIZE)]
     for i in range(NUM_ITER):
         # Generate random tours and calculate fitnesses
         fitnesses = [fitness(p) for p in population]
-        total_fitness = sum(fitnesses)
-        probabilities = [f/total_fitness for f in fitnesses]
         
         new_population = []
         for _ in range(int(POPULATION_SIZE/2)):
             # Tournament selection for parents with K=2
             parents = []
             for _ in range(2):
-                candidates = random.choices(population, probabilities, k=K)
+                candidates = random.choices(population, k=K)
                 parents.append(candidates[0] if fitness(candidates[0]) > fitness(candidates[1]) else candidates[1])
                 
             # Make children
@@ -84,10 +94,17 @@ def simple_ea(cities):
         
         population = new_population
         # Printing to show progress
-        print(f'Iteration {i}, best fitness: {max(fitnesses)}, avg fitness: {statistics.mean(fitnesses)}')
-        if max(fitnesses) > highest_fitness:
+        best_fitness = max(fitnesses)
+        avg_fitness = statistics.mean(fitnesses)
+        best_fitnesses.append(best_fitness)
+        avg_fitnesses.append(statistics.mean(fitnesses))
+        
+        print(f'Iteration {i}, best fitness: {best_fitness}, avg fitness: {avg_fitness}')
+        if best_fitness > highest_fitness:
             found_at = i
-            highest_fitness = max(fitnesses)
+            highest_fitness = best_fitness
+        
+    plot_progress(best_fitnesses, avg_fitnesses, f"simple_ea_progress_{filename}")
     return found_at, highest_fitness
 
 def two_opt_swap(tour, i, j):
@@ -108,10 +125,12 @@ def two_opt(tour):
                     improved = True
     return tour
 
-def memetic_algorithm(cities):
+def memetic_algorithm(cities, filename):
     print("Memetic Algorithm")
     highest_fitness = 0
     found_at = -1
+    best_fitnesses = []
+    avg_fitnesses = []
     
     population = [random.sample(cities, k=len(cities)) for _ in range(POPULATION_SIZE)]
     for i in range(NUM_ITER):
@@ -121,15 +140,13 @@ def memetic_algorithm(cities):
         
         # Generate random tours and calculate fitnesses
         fitnesses = [fitness(p) for p in population]
-        total_fitness = sum(fitnesses)
-        probabilities = [f/total_fitness for f in fitnesses]
         
         new_population = []
         for _ in range(int(POPULATION_SIZE/2)):
             # Tournament selection for parents with K=2
             parents = []
             for _ in range(2):
-                candidates = random.choices(population, probabilities, k=K)
+                candidates = random.choices(population, k=K)
                 parents.append(candidates[0] if fitness(candidates[0]) > fitness(candidates[1]) else candidates[1])
                 
             # Make children
@@ -141,23 +158,30 @@ def memetic_algorithm(cities):
         
         population = new_population
         # Printing to show progress
-        print(f'Iteration {i}, best fitness: {max(fitnesses)}, avg fitness: {statistics.mean(fitnesses)}')
-        if max(fitnesses) > highest_fitness:
+        best_fitness = max(fitnesses)
+        avg_fitness = statistics.mean(fitnesses)
+        best_fitnesses.append(best_fitness)
+        avg_fitnesses.append(statistics.mean(fitnesses))
+        
+        print(f'Iteration {i}, best fitness: {best_fitness}, avg fitness: {avg_fitness}')
+        if best_fitness > highest_fitness:
             found_at = i
-            highest_fitness = max(fitnesses)
+            highest_fitness = best_fitness
+        
+    plot_progress(best_fitnesses, avg_fitnesses, f"memetic_algorithm_progress_{filename}")
     return found_at, highest_fitness
 
     
 cities = import_cities('./file-tsp.txt')
-ea, ea_fitness = simple_ea(cities)
-ma, ma_fitness = memetic_algorithm(cities)
+ea, ea_fitness = simple_ea(cities, "file-tsp")
+ma, ma_fitness = memetic_algorithm(cities, "file-tsp")
 
 print(f"Simple EA found optimal route with distance {1/ea_fitness} at iteration: {ea}")
 print(f"Memetic Algorithm found optimal route with distance {1/ma_fitness} at iteration: {ma}")
 
 cities = import_cities('./berlin52.txt')
-ea, ea_fitness = simple_ea(cities)
-ma, ma_fitness = memetic_algorithm(cities)
+ea, ea_fitness = simple_ea(cities, "berlin52")
+ma, ma_fitness = memetic_algorithm(cities, "berlin52")
 
 print(f"Simple EA found optimal route with distance {1/ea_fitness} at iteration: {ea}")
 print(f"Memetic Algorithm found optimal route with distance {1/ma_fitness} at iteration: {ma}")
