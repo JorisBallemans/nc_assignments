@@ -1,4 +1,4 @@
-import random
+import random, math
 
 ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 LENGTH = 15
@@ -37,22 +37,33 @@ class Candidate():
         return f"String: {self.string} with P_i: {self.p_i} with fitness: {self.fitness}"
 
 
+def avg_distance(population :list[Candidate]):
+    total = 0
+    for i in range(len(population)):
+        for j in range(i + 1, len(population)):
+            total += sum([1 for k in range(len(population[i].string)) if population[i].string[k] != population[j].string[k]]) ** 2
+    return total / (len(population) * (len(population) - 1) / 2)
+
+
+def shannon_entropy(population :list[Candidate], index):   
+    total = 0
+    for s in ALPHABET:
+        fraction =  sum([1 for c in population if c.string[index] == s]) / len(population)
+        total += math.log(fraction) * fraction if fraction > 0 else 0
+    return -total
+
 def string_search(K, S, target, P_c , mu, N):
     population = []
     total_fitness = 0
 
     # Initialize population
     for _ in range(N):
-        population.append(Candidate(S, target))
-    
+        population.append(Candidate(S, target))    
 
     generation = 0
 
     while generation < MAX_GEN:
-        # Calculate total fitness
-        # total_fitness = sum([c.fitness for c in population])
-        # for c in population:
-        #     if c is None: print(1)
+        print(avg_distance(population))
         total_fitness = sum([c.fitness for c in population ])
         
         # Calculate P_i
@@ -84,14 +95,7 @@ def string_search(K, S, target, P_c , mu, N):
                 o2.mutate(S, mu, target)
                 new_population.append(o1)
                 new_population.append(o2)
-            # else:
-            #     #Mutate
-            #     p1.mutate(S, mu, target)
-            #     p2.mutate(S, mu, target)
-            #     new_population.append(p1)
-            #     new_population.append(p2)
         
-
         #Update
         population = new_population
         generation += 1
