@@ -7,7 +7,7 @@ K = 2
 POPULATION_SIZE = 200
 CROSSOVER_RATE = 1
 MUTATION_RATE = 1/LENGTH
-MAX_GEN = 2000
+MAX_GEN = 100000
 
 
 
@@ -44,12 +44,16 @@ def string_search(K, S, target, P_c , mu, N):
     # Initialize population
     for _ in range(N):
         population.append(Candidate(S, target))
+    
 
     generation = 0
 
     while generation < MAX_GEN:
         # Calculate total fitness
-        total_fitness = sum([c.fitness for c in population])
+        # total_fitness = sum([c.fitness for c in population])
+        # for c in population:
+        #     if c is None: print(1)
+        total_fitness = sum([c.fitness for c in population ])
         
         # Calculate P_i
         for c in population:
@@ -67,19 +71,8 @@ def string_search(K, S, target, P_c , mu, N):
         new_population = []
         
         while len(new_population) < N:
-            K_population = random.choices(population, k=K)
-
-            if sum([c.p_i for c in K_population]) == 0:
-                p1 = random.choices(K_population, k=1)[0]
-            else:
-                p1 = random.choices(K_population, weights = [c.p_i for c in K_population], k=1)[0]
-
-            K_population = random.choices(population, k=K)
-
-            if sum([c.p_i for c in K_population]) == 0:
-                p2 = random.choices(K_population, k=1)[0]
-            else:
-                p2 = random.choices(K_population, weights = [c.p_i for c in K_population], k=1)[0]
+            p1 = max(random.choices(population, k=K), key=lambda p: p.fitness)
+            p2 = max(random.choices(population, k=K), key=lambda p: p.fitness)
             
             #Crossover or mutate
             if random.random() < P_c:
@@ -87,6 +80,8 @@ def string_search(K, S, target, P_c , mu, N):
                 split = random.randint(1, len(target) - 1)
                 o1 = Candidate(S, target, p1.string[:split] + p2.string[split:])
                 o2 = Candidate(S, target, p2.string[:split] + p1.string[split:])
+                o1.mutate(S, mu, target)
+                o2.mutate(S, mu, target)
                 new_population.append(o1)
                 new_population.append(o2)
             # else:
@@ -95,9 +90,7 @@ def string_search(K, S, target, P_c , mu, N):
             #     p2.mutate(S, mu, target)
             #     new_population.append(p1)
             #     new_population.append(p2)
-
-        for c in new_population:
-            c.mutate(S, mu, target)
+        
 
         #Update
         population = new_population
