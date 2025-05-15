@@ -2,12 +2,12 @@ import random
 
 ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 LENGTH = 15
-TARGET = "NATURALCOMPUTING"#"".join(random.choices(ALPHABET, k=LENGTH))
+TARGET = "AAAAAAAAAAAAAAA"#"NATURALCOMPUTING"#"".join(random.choices(ALPHABET, k=LENGTH))
 K = 2
 POPULATION_SIZE = 200
 CROSSOVER_RATE = 1
 MUTATION_RATE = 1/LENGTH
-MAX_GEN = 100000
+MAX_GEN = 2000
 
 
 
@@ -36,6 +36,8 @@ class Candidate():
     def __str__(self):
         return f"String: {self.string} with P_i: {self.p_i} with fitness: {self.fitness}"
 
+def shannon_entropy(population : Candidate):
+
 
 def string_search(K, S, target, P_c , mu, N):
     population = []
@@ -44,17 +46,13 @@ def string_search(K, S, target, P_c , mu, N):
     # Initialize population
     for _ in range(N):
         population.append(Candidate(S, target))
-    
 
     generation = 0
 
     while generation < MAX_GEN:
         # Calculate total fitness
-        # total_fitness = sum([c.fitness for c in population])
-        # for c in population:
-        #     if c is None: print(1)
-        total_fitness = sum([c.fitness for c in population ])
-        
+        total_fitness = sum([c.fitness for c in population])
+
         # Calculate P_i
         for c in population:
             c.calculate_p_i(total_fitness)
@@ -71,8 +69,12 @@ def string_search(K, S, target, P_c , mu, N):
         new_population = []
         
         while len(new_population) < N:
-            p1 = max(random.choices(population, k=K), key=lambda p: p.fitness)
-            p2 = max(random.choices(population, k=K), key=lambda p: p.fitness)
+            K_population = random.choices(population, k=K)
+
+            K_population
+
+            return
+
             
             #Crossover or mutate
             if random.random() < P_c:
@@ -80,17 +82,11 @@ def string_search(K, S, target, P_c , mu, N):
                 split = random.randint(1, len(target) - 1)
                 o1 = Candidate(S, target, p1.string[:split] + p2.string[split:])
                 o2 = Candidate(S, target, p2.string[:split] + p1.string[split:])
-                o1.mutate(S, mu, target)
-                o2.mutate(S, mu, target)
                 new_population.append(o1)
                 new_population.append(o2)
-            # else:
-            #     #Mutate
-            #     p1.mutate(S, mu, target)
-            #     p2.mutate(S, mu, target)
-            #     new_population.append(p1)
-            #     new_population.append(p2)
-        
+
+        for c in new_population:
+            c.mutate(S, mu, target)
 
         #Update
         population = new_population
@@ -98,4 +94,8 @@ def string_search(K, S, target, P_c , mu, N):
         print(f"On generation: {generation}")
 
 if __name__ == "__main__":
-    string_search(K, ALPHABET, TARGET, CROSSOVER_RATE, MUTATION_RATE ,POPULATION_SIZE)
+    p1 = "AAAAAAAAAAAAAAA"
+    p2 = "BBBBBBBBBBBBBBB"
+    split = random.randint(1, len("AAAAAAAAAAAAAAA") - 1)
+    print(Candidate(ALPHABET, "AAAAAAAAAAAAAAA", p1[:split] + p2[split:]))
+    # string_search(K, ALPHABET, TARGET, CROSSOVER_RATE, MUTATION_RATE ,POPULATION_SIZE)

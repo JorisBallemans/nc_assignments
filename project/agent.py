@@ -1,13 +1,13 @@
 from strategy import Strategy
 from interaction import INTERACTION_MATRIX
-from random import betavariate
+
 
 class Agent:
     def __init__(self, id, strategy):
         self.id = id
         self.strategy = strategy
         self.reputation = dict()
-        self.persuasiveness = betavariate(0.5, 2)
+        # self.persuasiveness = betavariate(0.5, 2)
         self.food = 0
 
     def __str__(self):
