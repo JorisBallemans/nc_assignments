@@ -7,8 +7,7 @@ class Agent:
         self.id = id
         self.strategy = strategy
         self.reputation = dict()
-        # self.persuasiveness = betavariate(0.5, 2)
-        self.food = 0
+        self.food = 0      
 
     def __str__(self):
         return f"Agent {self.id}, strategy: {self.strategy} and persuasiveness: {self.persuasiveness:.2f}"
