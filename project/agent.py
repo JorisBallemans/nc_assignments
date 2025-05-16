@@ -16,7 +16,7 @@ class Agent:
         self.strategy = strategy
 
     def set_food(self, food):
-        self.food += food
+        self.food = food
 
     def update_reputation(self, id, d_reputation):
         if id not in self.reputation:
