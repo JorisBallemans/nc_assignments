@@ -37,7 +37,7 @@ class PopulationGraph:
         
         for line, column in zip(self.plot_lines, self.historical_data.columns):
             line.set_data(x_data, self.historical_data[column].values)
-
+        print(self.historical_data)
         self.ax.set_xlim(0, len(self.historical_data))
         self.ax.relim()
         self.ax.autoscale_view()

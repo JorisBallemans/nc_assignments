@@ -16,11 +16,11 @@ def main():
     population.append(Agent(5, S.DOMINANT))
     population.append(Agent(6, S.DOMINANT))
     population.append(Agent(7, S.GREEDY))
-    population.append(Agent(8, S.GREEDY))
-    population.append(Agent(9, S.GREEDY))
+    population.append(Agent(9, S.DOMINANT))
+    population.append(Agent(10, S.DOMINANT))
     graph = PopulationGraph(population)
     generation = 0
-    next_id = 10
+    next_id = len(population) + 1
 
     #Generation loop
     while generation < 100:
@@ -34,7 +34,7 @@ def main():
                 food_dict[food_index] = [agent.id]
             elif len(food_dict[food_index]) < 2:
                 food_dict[food_index].append(agent.id)
-        
+        # print(food_dict)
         #Agents interact (for all cases where food has 2 agents)
         for food_index in food_dict:
             # print(food_dict[food_index])
@@ -57,7 +57,6 @@ def main():
         #Update the population
         new_population = []
         for i in range(len(population)):
-            next_id = len(population) + 1
             if population[i].food == 0.5 and random.random() > 0.5:
                 new_population.append(population[i])
             if population[i].food == 1:
