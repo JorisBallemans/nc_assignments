@@ -4,13 +4,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from agent import Agent
 import pandas as pd
+import sys
 
 class PopulationGraph:
     def __init__(self, population, xlabel="Generation", ylabel="Population size"):
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.historical_data = pd.DataFrame()
-        self.add_generation(population)
+        self.add_generation(list(population.values()))
 
         self.fig, self.ax = plt.subplots()
         self.colors = ['red', 'green', 'blue']
@@ -41,5 +42,5 @@ class PopulationGraph:
         self.ax.set_xlim(0, len(self.historical_data))
         self.ax.relim()
         self.ax.autoscale_view()
-        plt.pause(0.5)
+        plt.pause(0.2)
 
