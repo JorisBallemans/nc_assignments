@@ -53,6 +53,7 @@ def update_population(NEXT_ID, population):
         if random.random() < agent.food:
             new_population[agent.id] = agent
         if random.random() + 1 < agent.food:
+            new_population[agent.id] = agent
             new_population[NEXT_ID] = Agent(NEXT_ID, agent.strategy)
             NEXT_ID += 1
     return new_population
@@ -72,7 +73,6 @@ def assign_food_to_agents(population, food_dict):
             a1 = population[food_dict[food_index][0]]
             a1.set_food(2)
 
-        print(agent.food)
 def distribute_food(population, food_dict):
     for agent in population.values():
         food_index = random.randint(0, config["FOOD"] - 1)
