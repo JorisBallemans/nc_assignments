@@ -22,7 +22,7 @@ class PopulationGraph:
             self.plot_lines.append(line)
 
         self.ax.set_xlim(0, 50)
-        self.ax.set_ylim(0, 100)
+        self.ax.set_ylim(0, 200)
         self.ax.set_xlabel(self.xlabel)
         self.ax.set_ylabel(self.ylabel)
         self.ax.set_title("Population dynamics")

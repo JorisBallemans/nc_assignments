@@ -7,7 +7,7 @@ import random
 config = {
     "FOOD": 100,
     "COOPERATIVE_COUNT": 20,
-    "DOMINANT_COUNT": 20
+    "DOMINANT_COUNT": 5
 }
 
 def main():
@@ -73,7 +73,7 @@ def assign_food_to_agents(population, food_dict):
             a1.set_food(2)
 
 def distribute_food(population, food_dict):
-    for agent in population.values():
+    for agent in random.sample(list(population.values()), len(population)):
         food_index = random.randint(0, config["FOOD"] - 1)
         if food_dict[food_index] is None:
             food_dict[food_index] = [agent.id]
