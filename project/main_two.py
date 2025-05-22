@@ -5,9 +5,9 @@ from strategy import Strategy as S
 import random
 
 config = {
-    "FOOD": 100,
-    "COOPERATIVE_COUNT": 20,
-    "DOMINANT_COUNT": 5
+    "FOOD": 1000,
+    "COOPERATIVE_COUNT": 500,
+    "DOMINANT_COUNT": 500
 }
 
 def main():
@@ -25,7 +25,7 @@ def main():
     generation = 0
     
     #Generation loop
-    while generation < 100:
+    while generation < 500:
         #Make a dictionary of food, assign food to agents
         food_dict = {i: None for i in range(config["FOOD"])}
         food_dict = distribute_food(population, food_dict)
@@ -64,7 +64,7 @@ def assign_food_to_agents(population, food_dict):
         if len(food_dict[food_index]) == 2:
             a1 = population[food_dict[food_index][0]]
             a2 = population[food_dict[food_index][1]]
-            f1, f2 = INTERACTION_MATRIX_MINORITY_DEATH[(a1.strategy, a2.strategy)]
+            f1, f2 = INTERACTION_MATRIX[(a1.strategy, a2.strategy)]
             print(f"Agent with strategy {a1.strategy} interacts with agent with strategy {a2.strategy} and receives food {f1} and {f2} respectively")
             a1.set_food(f1)
             a2.set_food(f2)
