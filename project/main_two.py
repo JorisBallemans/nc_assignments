@@ -1,13 +1,13 @@
 from agent import Agent
 from graph import PopulationGraph
-from interaction import INTERACTION_MATRIX
+from interaction import INTERACTION_MATRIX, INTERACTION_MATRIX_MINORITY_DEATH
 from strategy import Strategy as S
 import random
 
 config = {
     "FOOD": 100,
     "COOPERATIVE_COUNT": 20,
-    "DOMINANT_COUNT": 20,
+    "DOMINANT_COUNT": 20
 }
 
 def main():
@@ -38,7 +38,7 @@ def main():
         graph.update_plot()
 
         #Update the population
-        new_population = update_population(NEXT_ID, population)
+        new_population, NEXT_ID = update_population(NEXT_ID, population)
             
         for agent in list(new_population.values()):
             agent.set_food(0)
@@ -49,14 +49,13 @@ def main():
 
 def update_population(NEXT_ID, population):
     new_population = dict()
-    for agent in population.values():
+    for agent in list(population.values()):
         if random.random() < agent.food:
             new_population[agent.id] = agent
         if random.random() + 1 < agent.food:
-            new_population[agent.id] = agent
             new_population[NEXT_ID] = Agent(NEXT_ID, agent.strategy)
             NEXT_ID += 1
-    return new_population
+    return new_population, NEXT_ID
 
 def assign_food_to_agents(population, food_dict):
     for food_index in food_dict:
@@ -65,7 +64,7 @@ def assign_food_to_agents(population, food_dict):
         if len(food_dict[food_index]) == 2:
             a1 = population[food_dict[food_index][0]]
             a2 = population[food_dict[food_index][1]]
-            f1, f2 = INTERACTION_MATRIX[(a1.strategy, a2.strategy)]
+            f1, f2 = INTERACTION_MATRIX_MINORITY_DEATH[(a1.strategy, a2.strategy)]
             print(f"Agent with strategy {a1.strategy} interacts with agent with strategy {a2.strategy} and receives food {f1} and {f2} respectively")
             a1.set_food(f1)
             a2.set_food(f2)
