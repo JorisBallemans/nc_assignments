@@ -10,6 +10,8 @@ def calculate_mean_ci(data_dir = "data", ci = 0.95):
     data_files = [os.path.join(data_dir, f) for f in os.listdir("data") if f.endswith(".csv")]
     all_runs = [pd.read_csv(f) for f in data_files]
     average_run = pd.concat(all_runs).groupby(level=0).mean().reset_index(drop=True)
+    average_run.columns = [col.capitalize() for col in average_run.columns]
+    
     runs_stack = np.stack([df.values for df in all_runs])
 
     mean_runs = np.mean(runs_stack, axis=0)
