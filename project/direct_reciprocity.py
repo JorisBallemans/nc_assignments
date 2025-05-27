@@ -5,9 +5,9 @@ from strategy import Strategy as S
 import random
 
 config = {
-    "FOOD": 1000,
-    "COOPERATIVE_COUNT": 500,
-    "DOMINANT_COUNT": 500
+    "FOOD": 20,
+    "COOPERATIVE_COUNT": 5,
+    "DOMINANT_COUNT": 5
 }
 
 def main():
@@ -62,15 +62,40 @@ def assign_food_to_agents(population, food_dict):
         if food_dict[food_index] is None:
             continue
         if len(food_dict[food_index]) == 2:
+            # Get agents
             a1 = population[food_dict[food_index][0]]
             a2 = population[food_dict[food_index][1]]
-            f1, f2 = INTERACTION_MATRIX[(a1.strategy, a2.strategy)]
-            print(f"Agent with strategy {a1.strategy} interacts with agent with strategy {a2.strategy} and receives food {f1} and {f2} respectively")
-            a1.set_food(f1)
-            a2.set_food(f2)
+            # Change strategies of agents based on direct reciprocity
+            tit_for_tat(a1, a2)
+            
+            # Give food
+            a1.interact_with(a2)
+            
+            # Update information about interaction
+            a1.update_positive_last_interaction(a2)
+            a2.update_positive_last_interaction(a1)
         if len(food_dict[food_index]) == 1:
             a1 = population[food_dict[food_index][0]]
             a1.set_food(2)
+
+def tit_for_tat(a1, a2):
+    if a1.get_positive_last_interaction(a2) is not None:
+        positive = a1.get_positive_last_interaction(a2)
+        if positive:
+            a1.set_strategy(S.COOPERATIVE)
+            print(f"Agent {a1.id} is now cooperative")
+        else:
+            a1.set_strategy(S.DOMINANT)
+            print(f"Agent {a1.id} is now dominant")
+                    
+    if a2.get_positive_last_interaction(a1) is not None:
+        positive = a2.get_positive_last_interaction(a1)
+        if positive:
+            a2.set_strategy(S.COOPERATIVE)
+            print(f"Agent {a2.id} is now cooperative")
+        else:
+            a2.set_strategy(S.DOMINANT)
+            print(f"Agent {a2.id} is now dominant")
 
 def distribute_food(population, food_dict):
     for agent in random.sample(list(population.values()), len(population)):

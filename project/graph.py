@@ -21,8 +21,6 @@ class PopulationGraph:
             line, = self.ax.plot([], [], label=column, color=color)
             self.plot_lines.append(line)
 
-        # self.ax.set_xlim(0, 50)
-        # self.ax.set_ylim(0, 200)
         self.ax.set_xlabel(self.xlabel)
         self.ax.set_ylabel(self.ylabel)
         self.ax.set_title("Population dynamics")
@@ -38,7 +36,7 @@ class PopulationGraph:
         
         for line, column in zip(self.plot_lines, self.historical_data.columns):
             line.set_data(x_data, self.historical_data[column].values)
-        print(self.historical_data)
+        # print(self.historical_data)
         self.ax.set_xlim(0, len(self.historical_data))
         self.ax.relim()
         self.ax.autoscale_view()
