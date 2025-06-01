@@ -1,51 +1,105 @@
 from agent import Agent
 from graph import PopulationGraph
-from interaction import INTERACTION_MATRIX, INTERACTION_MATRIX_MINORITY_DEATH
 from strategy import Strategy as S
 import random
-
-config = {
-    "FOOD": 1000,
-    "COOPERATIVE_COUNT": 500,
-    "DOMINANT_COUNT": 500
-}
+import argparse
+import pandas as pd
+import os
 
 def main():
-    NEXT_ID = 1
-    #Initialize the population
-    population = dict()
+    parser=argparse.ArgumentParser()
+    parser.add_argument("-f",   "--food",   type=int, help = "Defines the count of food", default=100)
+    parser.add_argument("-g",   "--greedy", type=int, help = "Defines the count of greedy agents", default=50)
+    parser.add_argument("-c",   "--coop",   type=int, help = "Defines the count of cooperative agents", default=50)
+    parser.add_argument("-gc",  "--gen",    type=int, help = "Defines the count of generations", default=100)
+    parser.add_argument("-r",   "--runs",   type=int, help = "Defines the count of runs", default=0)
+    args = parser.parse_args()
 
-    for _ in range(1, config["COOPERATIVE_COUNT"] + 1):
-        population[NEXT_ID] = Agent(NEXT_ID, S.COOPERATIVE)
-        NEXT_ID += 1
-    for _ in range(1, config["DOMINANT_COUNT"] + 1):
-        population[NEXT_ID] = Agent(NEXT_ID, S.DOMINANT)
-        NEXT_ID += 1
-    graph = PopulationGraph(population)
-    generation = 0
-    
-    #Generation loop
-    while generation < 500:
-        #Make a dictionary of food, assign food to agents
-        food_dict = {i: None for i in range(config["FOOD"])}
-        food_dict = distribute_food(population, food_dict)
+    #DATA GENERATION MODE
+    if args.runs > 0:
+        print("Data generation mode activated.")
+        print("No graph will be shown.")
+        print("Bleep bloop, I am a robot.")
+        print(f"Running {args.runs} runs with {args.coop} cooperative and {args.greedy} greedy agents for {args.gen} generations with {args.food} food each.")
         
-        #Agents interact (for all cases where food has 2 agents)
-        assign_food_to_agents(population, food_dict)
+        os.makedirs(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}", exist_ok=True)
 
-        #Update the graph
-        graph.add_generation(list(population.values()))
-        graph.update_plot()
+        for iter_run in range(args.runs):
+            historical_data = pd.DataFrame()
+            NEXT_ID = 1
+            #Initialize the population
+            population = dict()
 
-        #Update the population
-        new_population, NEXT_ID = update_population(NEXT_ID, population)
+            for _ in range(1, args.coop + 1):
+                population[NEXT_ID] = Agent(NEXT_ID, S.COOPERATIVE)
+                NEXT_ID += 1
+            for _ in range(1, args.greedy + 1):
+                population[NEXT_ID] = Agent(NEXT_ID, S.DOMINANT)
+                NEXT_ID += 1
+            generation = 0
             
-        for agent in list(new_population.values()):
-            agent.set_food(0)
+            #Generation loop
+            while generation < args.gen:
+                #Make a dictionary of food, assign food to agents
+                food_dict = {i: None for i in range(args.food)}
+                food_dict = distribute_food(population, food_dict, args.food)
+                
+                #Agents interact (for all cases where food has 2 agents)
+                assign_food_to_agents(population, food_dict)
+                
+                #Generate historical data
+                strategies = [agent.strategy.name.lower() for agent in list(population.values())]
+                strategy_counts = pd.Series(strategies).value_counts()
+                historical_data = pd.concat([historical_data, strategy_counts.to_frame().T], ignore_index=True)
+
+                #Update the population
+                new_population, NEXT_ID = update_population(NEXT_ID, population)
+                    
+                for agent in list(new_population.values()):
+                    agent.set_food(0)
+                    
+                population = new_population
+                generation += 1
+            historical_data.to_csv(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}/run_{iter_run}.csv", index=False)
+        return
+
+    #NORMAL MODE
+    else:
+        NEXT_ID = 1
+        #Initialize the population
+        population = dict()
+
+        for _ in range(1, args.coop + 1):
+            population[NEXT_ID] = Agent(NEXT_ID, S.COOPERATIVE)
+            NEXT_ID += 1
+        for _ in range(1, args.greedy + 1):
+            population[NEXT_ID] = Agent(NEXT_ID, S.DOMINANT)
+            NEXT_ID += 1
+        graph = PopulationGraph(population)
+        generation = 0
+        
+        #Generation loop
+        while generation < args.gen:
+            #Make a dictionary of food, assign food to agents
+            food_dict = {i: None for i in range(args.food)}
+            food_dict = distribute_food(population, food_dict, args.food)
             
-        population = new_population
-        generation += 1
-    return
+            #Agents interact (for all cases where food has 2 agents)
+            assign_food_to_agents(population, food_dict)
+
+            #Update the graph
+            graph.add_generation(list(population.values()))
+            graph.update_plot()
+
+            #Update the population
+            new_population, NEXT_ID = update_population(NEXT_ID, population)
+                
+            for agent in list(new_population.values()):
+                agent.set_food(0)
+                
+            population = new_population
+            generation += 1
+        return
 
 def update_population(NEXT_ID, population):
     new_population = dict()
@@ -69,9 +123,9 @@ def assign_food_to_agents(population, food_dict):
             a1 = population[food_dict[food_index][0]]
             a1.set_food(2)
 
-def distribute_food(population, food_dict):
+def distribute_food(population, food_dict, food_count):
     for agent in random.sample(list(population.values()), len(population)):
-        food_index = random.randint(0, config["FOOD"] - 1)
+        food_index = random.randint(0, food_count - 1)
         if food_dict[food_index] is None:
             food_dict[food_index] = [agent.id]
         elif len(food_dict[food_index]) < 2:
