@@ -1,7 +1,6 @@
 from strategy import Strategy
 from interaction import INTERACTION_MATRIX
 
-
 class Agent:
     def __init__(self, id, strategy):
         self.id = id

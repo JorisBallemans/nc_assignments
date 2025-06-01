@@ -11,7 +11,7 @@ def main():
     parser.add_argument("-f",   "--food",   type=int, help = "Defines the count of food", default=100)
     parser.add_argument("-g",   "--greedy", type=int, help = "Defines the count of greedy agents", default=50)
     parser.add_argument("-c",   "--coop",   type=int, help = "Defines the count of cooperative agents", default=50)
-    parser.add_argument("-gc",  "--gen",    type=int, help = "Defines the count of generations", default=100)
+    parser.add_argument("-gc",  "--gen",    type=int, help = "Defines the count of generations", default=200)
     parser.add_argument("-r",   "--runs",   type=int, help = "Defines the count of runs", default=0)
     args = parser.parse_args()
 
@@ -50,6 +50,10 @@ def main():
                 #Generate historical data
                 strategies = [agent.strategy.name.lower() for agent in list(population.values())]
                 strategy_counts = pd.Series(strategies).value_counts()
+                all_strategies = [s.name.lower() for s in S]
+                for strategy in all_strategies:
+                    if strategy not in strategy_counts:
+                        strategy_counts[strategy] = 0
                 historical_data = pd.concat([historical_data, strategy_counts.to_frame().T], ignore_index=True)
 
                 #Update the population
@@ -60,6 +64,7 @@ def main():
                     
                 population = new_population
                 generation += 1
+            print(f"Run {iter_run + 1} completed.")
             historical_data.to_csv(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}/run_{iter_run}.csv", index=False)
         return
 
