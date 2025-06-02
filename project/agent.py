@@ -5,7 +5,7 @@ class Agent:
     def __init__(self, id, strategy):
         self.id = id
         self.strategy = strategy
-        self.reputation = dict()
+        self.reputation = 0
         self.food = 0
         self.positive_last_interaction = dict()      
 
@@ -18,10 +18,11 @@ class Agent:
     def set_food(self, food):
         self.food = food
 
-    def update_reputation(self, id, d_reputation):
-        if id not in self.reputation:
-            self.reputation[id] = 0
-        self.reputation[id] += d_reputation
+    def update_reputation(self, positive):
+        if positive:
+            self.reputation += 1
+        else :
+            self.reputation -= 1
         
     def update_positive_last_interaction(self, other):
         if other.strategy == Strategy.COOPERATIVE:
