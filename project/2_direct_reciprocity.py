@@ -124,6 +124,9 @@ def assign_food_to_agents(population, food_dict):
             # Get agents
             a1 = population[food_dict[food_index][0]]
             a2 = population[food_dict[food_index][1]]
+            
+            a1_strategy = a1.strategy
+            a2_strategy = a2.strategy
             # Change strategies of agents based on direct reciprocity
             tit_for_tat(a1, a2)
             
@@ -133,6 +136,10 @@ def assign_food_to_agents(population, food_dict):
             # Update information about interaction
             a1.update_positive_last_interaction(a2)
             a2.update_positive_last_interaction(a1)
+            
+            # Give agents original strategy back
+            a1.set_strategy(a1_strategy)
+            a2.set_strategy(a2_strategy)
         if len(food_dict[food_index]) == 1:
             a1 = population[food_dict[food_index][0]]
             a1.set_food(2)
