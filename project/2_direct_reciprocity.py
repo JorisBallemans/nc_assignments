@@ -142,19 +142,19 @@ def tit_for_tat(a1, a2):
         positive = a1.get_positive_last_interaction(a2)
         if positive:
             a1.set_strategy(S.COOPERATIVE)
-            print(f"Agent {a1.id} is now cooperative")
+            # print(f"Agent {a1.id} is now cooperative")
         else:
             a1.set_strategy(S.DOMINANT)
-            print(f"Agent {a1.id} is now dominant")
+            # print(f"Agent {a1.id} is now dominant")
                     
     if a2.get_positive_last_interaction(a1) is not None:
         positive = a2.get_positive_last_interaction(a1)
         if positive:
             a2.set_strategy(S.COOPERATIVE)
-            print(f"Agent {a2.id} is now cooperative")
+            # print(f"Agent {a2.id} is now cooperative")
         else:
             a2.set_strategy(S.DOMINANT)
-            print(f"Agent {a2.id} is now dominant")
+            # print(f"Agent {a2.id} is now dominant")
 
 def distribute_food(population, food_dict, food_count):
     for agent in random.sample(list(population.values()), len(population)):
