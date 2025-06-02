@@ -125,6 +125,9 @@ def assign_food_to_agents(population, food_dict):
             # Get agents
             a1 = population[food_dict[food_index][0]]
             a2 = population[food_dict[food_index][1]]
+            
+            a1_strategy = a1.strategy
+            a2_strategy = a2.strategy
             # Change strategies of agents based on indirect reciprocity
             image_scoring(a1, a2)
             image_scoring(a2, a1)
@@ -137,6 +140,10 @@ def assign_food_to_agents(population, food_dict):
             cooperative_a2 = a2.strategy == S.COOPERATIVE
             a1.update_reputation(cooperative_a1)
             a2.update_reputation(cooperative_a2)
+            
+            # Give agents original strategy back
+            a1.set_strategy(a1_strategy)
+            a2.set_strategy(a2_strategy)
             
         if len(food_dict[food_index]) == 1:
             a1 = population[food_dict[food_index][0]]
