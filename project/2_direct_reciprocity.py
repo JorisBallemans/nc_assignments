@@ -45,7 +45,7 @@ def main():
                 food_dict = distribute_food(population, food_dict, args.food)
                 
                 #Agents interact (for all cases where food has 2 agents)
-                assign_food_to_agents(population, food_dict)
+                rep_interactions, changed_intertactions = assign_food_to_agents(population, food_dict)
                 
                 #Generate historical data
                 strategies = [agent.strategy.name.lower() for agent in list(population.values())]
@@ -90,7 +90,8 @@ def main():
             food_dict = distribute_food(population, food_dict, args.food)
             
             #Agents interact (for all cases where food has 2 agents)
-            assign_food_to_agents(population, food_dict)
+            rep_interactions, changed_interactions = assign_food_to_agents(population, food_dict)
+            print(f"Generation {generation}: {rep_interactions} rep interactions, {changed_interactions} changed interactions")
 
             #Update the graph
             graph.add_generation(list(population.values()))
@@ -117,6 +118,8 @@ def update_population(NEXT_ID, population):
     return new_population, NEXT_ID
 
 def assign_food_to_agents(population, food_dict):
+    changed_interactions = 0
+    rep_interactions = 0
     for food_index in food_dict:
         if food_dict[food_index] is None:
             continue
@@ -128,7 +131,10 @@ def assign_food_to_agents(population, food_dict):
             a1_strategy = a1.strategy
             a2_strategy = a2.strategy
             # Change strategies of agents based on direct reciprocity
-            tit_for_tat(a1, a2)
+            rep_interaction, changed_interaction = tit_for_tat(a1, a2)
+            
+            changed_interactions += changed_interaction
+            rep_interactions += rep_interaction
             
             # Give food
             a1.interact_with(a2)
@@ -143,25 +149,28 @@ def assign_food_to_agents(population, food_dict):
         if len(food_dict[food_index]) == 1:
             a1 = population[food_dict[food_index][0]]
             a1.set_food(2)
+    return rep_interactions, changed_interactions
 
 def tit_for_tat(a1, a2):
+    strategy_interactions = 0
+    rep_interactions = 0
     if a1.get_positive_last_interaction(a2) is not None:
+        rep_interactions += 1
         positive = a1.get_positive_last_interaction(a2)
-        if positive:
-            a1.set_strategy(S.COOPERATIVE)
-            # print(f"Agent {a1.id} is now cooperative")
-        else:
-            a1.set_strategy(S.DOMINANT)
-            # print(f"Agent {a1.id} is now dominant")
-                    
+        new_strategy = S.COOPERATIVE if positive else S.DOMINANT
+        if a1.strategy != new_strategy:
+            a1.set_strategy(new_strategy)
+            strategy_interactions += 1
+
     if a2.get_positive_last_interaction(a1) is not None:
+        rep_interactions += 1
         positive = a2.get_positive_last_interaction(a1)
-        if positive:
-            a2.set_strategy(S.COOPERATIVE)
-            # print(f"Agent {a2.id} is now cooperative")
-        else:
-            a2.set_strategy(S.DOMINANT)
-            # print(f"Agent {a2.id} is now dominant")
+        new_strategy = S.COOPERATIVE if positive else S.DOMINANT
+        if a2.strategy != new_strategy:
+            a2.set_strategy(new_strategy)
+            strategy_interactions += 1
+
+    return rep_interactions, strategy_interactions
 
 def distribute_food(population, food_dict, food_count):
     for agent in random.sample(list(population.values()), len(population)):

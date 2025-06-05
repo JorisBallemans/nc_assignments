@@ -46,6 +46,8 @@ for idx, folder in enumerate(folders):
         plt.ylim([0, avg_run.iloc[0].sum() * 1.5])
     elif avg_run.iloc[0].min() == 50:
         plt.ylim([50, avg_run.iloc[0].min() * 1.7])
+    elif avg_run.iloc[0].min() == 25:
+        plt.ylim([20, avg_run.iloc[0].min() * 2])    
     elif avg_run.iloc[0].min() == 500:
         plt.ylim([500, avg_run.iloc[0].min() * 1.55])
     else:
