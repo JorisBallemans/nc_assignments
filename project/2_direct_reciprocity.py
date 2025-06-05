@@ -23,9 +23,13 @@ def main():
         print(f"Running {args.runs} runs with {args.coop} cooperative and {args.greedy} greedy agents for {args.gen} generations with {args.food} food each.")
         
         os.makedirs(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}", exist_ok=True)
+        
+        interactions = pd.DataFrame()
 
         for iter_run in range(args.runs):
             historical_data = pd.DataFrame()
+            total_interactions = 0
+            total_changed_interactions = 0
             NEXT_ID = 1
             #Initialize the population
             population = dict()
@@ -45,7 +49,9 @@ def main():
                 food_dict = distribute_food(population, food_dict, args.food)
                 
                 #Agents interact (for all cases where food has 2 agents)
-                rep_interactions, changed_intertactions = assign_food_to_agents(population, food_dict)
+                rep_interactions, changed_interactions = assign_food_to_agents(population, food_dict)
+                total_interactions += rep_interactions
+                total_changed_interactions += changed_interactions
                 
                 #Generate historical data
                 strategies = [agent.strategy.name.lower() for agent in list(population.values())]
@@ -66,6 +72,8 @@ def main():
                 generation += 1
             print(f"Run {iter_run + 1} completed.")
             historical_data.to_csv(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}/run_{iter_run}.csv", index=False)
+            interactions = pd.concat([interactions, pd.DataFrame({"run": iter_run + 1, "rep_interactions": total_interactions, "changed_interactions": total_changed_interactions}, index=[0])], ignore_index=True)
+        interactions.to_csv(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}/interactions.csv", index=False)
         return
 
     #NORMAL MODE
@@ -91,7 +99,7 @@ def main():
             
             #Agents interact (for all cases where food has 2 agents)
             rep_interactions, changed_interactions = assign_food_to_agents(population, food_dict)
-            print(f"Generation {generation}: {rep_interactions} rep interactions, {changed_interactions} changed interactions")
+            # print(f"Generation {generation}: {rep_interactions} rep interactions, {changed_interactions} changed interactions")
 
             #Update the graph
             graph.add_generation(list(population.values()))
