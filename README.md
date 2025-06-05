@@ -18,7 +18,7 @@ The files can be run with the following parameters:
 "-f",   "--food",   type=int, help = "Defines the count of food", default=100)
 "-g",   "--greedy", type=int, help = "Defines the count of greedy agents", default=50)
 "-c",   "--coop",   type=int, help = "Defines the count of cooperative agents", default=50)
-"-gc",  "--gen",    type=int, help = "Defines the count of generations", default=200)
+"-ge",  "--gen",    type=int, help = "Defines the count of generations", default=200)
 "-r",   "--runs",   type=int, help = "Defines the count of runs", default=0)
 ```
 
