@@ -24,8 +24,13 @@ def main():
         
         os.makedirs(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}", exist_ok=True)
 
+        interactions = pd.DataFrame()
+
         for iter_run in range(args.runs):
             historical_data = pd.DataFrame()
+            total_interactions = 0
+            total_changed_interactions = 0
+
             NEXT_ID = 1
             #Initialize the population
             population = dict()
@@ -45,8 +50,10 @@ def main():
                 food_dict = distribute_food(population, food_dict, args.food)
                 
                 #Agents interact (for all cases where food has 2 agents)
-                assign_food_to_agents(population, food_dict)
-                
+                rep_interactions, changed_interactions = assign_food_to_agents(population, food_dict)
+                total_interactions += rep_interactions
+                total_changed_interactions += changed_interactions
+
                 #Generate historical data
                 strategies = [agent.strategy.name.lower() for agent in list(population.values())]
                 strategy_counts = pd.Series(strategies).value_counts()
@@ -66,6 +73,8 @@ def main():
                 generation += 1
             print(f"Run {iter_run + 1} completed.")
             historical_data.to_csv(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}/run_{iter_run}.csv", index=False)
+            interactions = pd.concat([interactions, pd.DataFrame({"run": iter_run + 1, "rep_interactions": total_interactions, "changed_interactions": total_changed_interactions}, index=[0])], ignore_index=True)
+        interactions.to_csv(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}_interactions.csv", index=False)
         return
 
     #NORMAL MODE
@@ -118,6 +127,8 @@ def update_population(NEXT_ID, population):
     return new_population, NEXT_ID
 
 def assign_food_to_agents(population, food_dict):
+    changed_interactions = 0
+    rep_interactions = 0
     for food_index in food_dict:
         if food_dict[food_index] is None:
             continue
@@ -129,9 +140,12 @@ def assign_food_to_agents(population, food_dict):
             a1_strategy = a1.strategy
             a2_strategy = a2.strategy
             # Change strategies of agents based on indirect reciprocity
-            image_scoring(a1, a2)
-            image_scoring(a2, a1)
+            rep_interaction_a1, changed_interactions_a1 = image_scoring(a1, a2)
+            rep_interaction_a2, changed_interactions_a2 = image_scoring(a2, a1)
             
+            changed_interactions += changed_interactions_a1 + changed_interactions_a2
+            rep_interactions += rep_interaction_a1 + rep_interaction_a2
+
             # Give food
             a1.interact_with(a2)
             
@@ -148,14 +162,26 @@ def assign_food_to_agents(population, food_dict):
         if len(food_dict[food_index]) == 1:
             a1 = population[food_dict[food_index][0]]
             a1.set_food(2)
+    return rep_interactions, changed_interactions
 
 def image_scoring(a1, a2):
+    strategy_interactions = 0
+    rep_interactions = 0
     if a1.reputation > 0:
+        rep_interactions += 1
+        if a2.strategy != S.COOPERATIVE:
+            strategy_interactions += 1
         a2.set_strategy(S.COOPERATIVE)
         print(f"Agent {a2.id} is now cooperative")
-    if a1.reputation < 0:
+    elif a1.reputation < 0:
+        rep_interactions += 1
+        if a2.strategy != S.DOMINANT:
+            strategy_interactions += 1
         a2.set_strategy(S.DOMINANT)
         print(f"Agent {a2.id} is now dominant")
+    else:
+        print(f"Agent {a2.id} keeps its strategy {a2.strategy.name.lower()}")
+    return rep_interactions, strategy_interactions
 
 def distribute_food(population, food_dict, food_count):
     for agent in random.sample(list(population.values()), len(population)):
