@@ -22,7 +22,7 @@ def main():
         print("Bleep bloop, I am a robot.")
         print(f"Running {args.runs} runs with {args.coop} cooperative and {args.greedy} greedy agents for {args.gen} generations with {args.food} food each.")
         
-        os.makedirs(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}", exist_ok=True)
+        os.makedirs(f"data/tft_f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}", exist_ok=True)
         
         interactions = pd.DataFrame()
 
