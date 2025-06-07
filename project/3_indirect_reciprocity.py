@@ -72,9 +72,9 @@ def main():
                 population = new_population
                 generation += 1
             print(f"Run {iter_run + 1} completed.")
-            historical_data.to_csv(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}/run_{iter_run}.csv", index=False)
+            historical_data.to_csv(f"data/idr_f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}/run_{iter_run}.csv", index=False)
             interactions = pd.concat([interactions, pd.DataFrame({"run": iter_run + 1, "rep_interactions": total_interactions, "changed_interactions": total_changed_interactions}, index=[0])], ignore_index=True)
-        interactions.to_csv(f"data/f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}_interactions.csv", index=False)
+        interactions.to_csv(f"data/idr_f_{args.food}_c_{args.coop}_g_{args.greedy}_gen_{args.gen}_interactions.csv", index=False)
         return
 
     #NORMAL MODE
